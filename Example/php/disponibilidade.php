@@ -20,7 +20,10 @@ foreach($_POST['checkbox'] as $disponibilidade){
     $disp = $disp . $disponibilidade . ',';
 }
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
 if($_SESSION['utilizador'] == 'voluntario'){
   $query = "SELECT id FROM disp_volt WHERE id = " . $_SESSION['id'] . "";
   $result = $conn->query($query);

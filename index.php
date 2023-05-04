@@ -1,7 +1,10 @@
 <?php
 include 'dbConnection.php';
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
 // Set default user ID if user is not logged in
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : -1;
 // Get user preferences if user is logged in
@@ -35,8 +38,8 @@ if ($user_id != -1) {
 }
 
 
-// Get all products ordered by user preferences, or without any order if user is not logged in
-$query = "SELECT Products.* FROM Products WHERE seller_id != ?";
+// Get all available products ordered by user preferences, or without any order if user is not logged in
+$query = "SELECT Products.* FROM Products WHERE seller_id != ? and available = 1";
 $order_by = [];
 if ($user_id != -1) {
     if (!empty($preferred_types)) {
@@ -105,6 +108,17 @@ if ($user_id != -1) {
         .favorite-icon.bi-star-fill {
             color: #FFD700;
         }
+           /*smaller search bar and center aligning */
+           #search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        #search-bar {
+            width: 66%;
+        }
+        /* End of new CSS */
     </style>
     <script>
 $('.form').find('input, textarea').on('keyup blur focus', function (e) {
@@ -154,41 +168,29 @@ $('.tab a').on('click', function (e) {
     </script>
     </head>
     <body>
-
-<!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="index.php">2HandCloth</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <?php if (isset($_SESSION['user_id'])) { ?>
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" href="index.php" aria-current="page">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="preferences.php">Preferências</a></li>
-                    <li class="nav-item"><a class="nav-link" href="insert_product.php">Vender Produto</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <div class="me-3">
-                        <span>Bem-vindo, <?php echo $_SESSION['nome_completo']; ?></span>
-                    </div>
-                    <a class="btn btn-outline-dark" href="preferences.php">
-                        <i class="bi bi-gear"></i>
-                        Preferências
-                    </a>
-                </div>
-            <?php } else { ?>
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" href="index.php" aria-current="page">Home</a></li>
-                </ul>
-                <a class="btn btn-outline-dark" href="SignIn.php">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    Login / Inscreva-se
-                </a>
-            <?php } ?>
-        </div>
+    
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
     </div>
-</nav>
-
+  </div>
+</div>
+        <!-- Navigation-->
+        <?php include 'navbar.php'; ?>
 
         <!-- Header-->
         <header class="bg-dark py-5">
@@ -200,16 +202,21 @@ $('.tab a').on('click', function (e) {
             </div>
         </header>
         <!-- Section-->
-        <form class="d-flex mb-4">
-    <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" id="search-bar" />
+        <br>
+          <div id="search-container">
+            <form class="d-flex mb-4">
+                <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" id="search-bar" />
+                <button class="btn btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse" aria-expanded="false" aria-controls="filter-collapse">
+        <i class="bi bi-funnel"></i>
+        Filtros
+    </button>
+            </form>
+        </div>
             <!-- searchsame as above but with 30% width and centered -->
 
 
 
-    <button class="btn btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse" aria-expanded="false" aria-controls="filter-collapse">
-        <i class="bi bi-funnel"></i>
-        Filtros
-    </button>
+   
 </form>
 
 <div class="collapse" id="filter-collapse">
@@ -255,6 +262,7 @@ $('.tab a').on('click', function (e) {
         <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        <?php if (count($products) > 0): ?>
             <?php foreach ($products as $product): ?>
                 <div class="col mb-5 product-item" data-title="<?php echo htmlspecialchars($product['title']); ?>">
                     <div class="card h-100">
@@ -270,18 +278,26 @@ $('.tab a').on('click', function (e) {
                             </div>
                         </div>
                         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center">
-                                <?php if (isset($_SESSION['user_id'])) { ?>
-                                    <div class="bi <?php echo in_array($product['product_id'], $favorite_products) ? 'bi-star-fill' : 'bi-star'; ?> favorite-icon" data-product-id="<?php echo $product['product_id']; ?>"></div>
-                                    <a class="btn btn-outline-dark mt-auto" href="#">Carrinho</a>
-                                <?php } else { ?>
-                                    <a class="btn btn-outline-dark mt-auto" href="SignIn.php">Carrinho</a>
-                                <?php } ?>
-                            </div>
+                        <div class="text-center">
+    <?php if (isset($_SESSION['user_id'])) { ?>
+        <form method="POST" action="purchase.php">
+            <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
+            <button type="submit" class="btn btn-outline-dark mt-auto">Carrinho</button>
+        </form>
+    <?php } else { ?>
+        <a class="btn btn-outline-dark mt-auto" href="SignIn.php">Carrinho</a>
+    <?php } ?>
+</div>
                         </div>
                     </div>
                 </div>
             <?php endforeach; ?>
+            <?php else: ?>
+                 <!-- Display "No products found" message when no products are available -->
+                 <div class="col-12 text-center">
+                            <h4>No products found</h4>
+                        </div>
+                    <?php endif; ?>
         </div>
     </div>
 </section>
@@ -299,7 +315,20 @@ $('.tab a').on('click', function (e) {
         <script>
 document.addEventListener('DOMContentLoaded', function() {
     const favoriteIcons = document.querySelectorAll('.favorite-icon');
+    const searchInput = document.querySelector('#search-bar');
+    const productItems = document.querySelectorAll('.product-item');
 
+    searchInput.addEventListener('input', function() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        productItems.forEach(item => {
+            const title = item.dataset.title.toLowerCase();
+            if (title.includes(searchTerm)) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+    });
     favoriteIcons.forEach(icon => {
         icon.addEventListener('click', function() {
             const productId = this.dataset.productId;
@@ -318,22 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.querySelector('#search-bar');
-    const productItems = document.querySelectorAll('.product-item');
 
-    searchInput.addEventListener('input', function() {
-        const searchTerm = searchInput.value.trim().toLowerCase();
-        productItems.forEach(item => {
-            const title = item.dataset.title.toLowerCase();
-            if (title.includes(searchTerm)) {
-                item.classList.remove('d-none');
-            } else {
-                item.classList.add('d-none');
-            }
-        });
-    });
-});
 </script>
 
     </body>

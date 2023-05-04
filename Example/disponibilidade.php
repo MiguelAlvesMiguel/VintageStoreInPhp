@@ -144,7 +144,10 @@ body > * {
                     </li>
                     <?php
                                 include "php/abreconexao.php";  
-                                session_start();
+                                if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
                                 if (isset ($_SESSION['utilizador']) > 0) {
                                     if($_SESSION['utilizador'] == 'voluntario'){
                                         echo "<li class='nav-item'>

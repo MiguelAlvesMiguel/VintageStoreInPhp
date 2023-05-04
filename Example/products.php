@@ -73,7 +73,10 @@ https://www.tooplate.com/view/2127-little-fashion
                             </li>
                             <?php
                                 include "php/abreconexao.php";  
-                                session_start();
+                                if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
                                 // echo isset($_SESSION['utilizador']);
                                 if (isset ($_SESSION['utilizador']) > 0) {
                                     if($_SESSION['utilizador'] == 'voluntario'){

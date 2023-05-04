@@ -61,7 +61,10 @@
 
     <?php
         include "php/abreconexao.php";  
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
         $sql = "SELECT * FROM disp_volt WHERE id = " . $_SESSION['id'] . "";
         $result = $conn->query($sql);
         $rowd = $result->fetch_assoc();

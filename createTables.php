@@ -45,6 +45,7 @@ function createTables($conn)
     )",
         "CREATE TABLE IF NOT EXISTS Products (
             product_id INT AUTO_INCREMENT PRIMARY KEY,
+            available BOOLEAN NOT NULL DEFAULT TRUE,
             image_url VARCHAR(255) NOT NULL,
             seller_id INT NOT NULL,
             title VARCHAR(255) NOT NULL,
@@ -369,7 +370,7 @@ if ($stmt = $conn->prepare($sql)) {
                 $size = $conn->real_escape_string($product['size']);
                 $brand = $conn->real_escape_string($product['brand']);
             
-                $sql = "INSERT INTO Products (image_url, seller_id, title, description, category_id, type_id, size, brand, `condition`, price) VALUES ('{$image_url}','{$product['seller_id']}', '{$title}', '{$description}', {$product['category_id']}, {$product['type_id']}, '{$size}', '{$brand}', '{$product['condition']}', {$product['price']})";
+                $sql = "INSERT INTO Products (available,image_url, seller_id, title, description, category_id, type_id, size, brand, `condition`, price) VALUES (1,'{$image_url}','{$product['seller_id']}', '{$title}', '{$description}', {$product['category_id']}, {$product['type_id']}, '{$size}', '{$brand}', '{$product['condition']}', {$product['price']})";
                 
                 if (!$conn->query($sql)) {
                     echo "Error inserting product: " . $conn->error . "\n";

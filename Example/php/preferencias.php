@@ -9,7 +9,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 //--------------------------------------------------//
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
 if($_SESSION['utilizador'] == 'voluntario'){
     $query="SELECT * FROM pref_volt WHERE id = " . $_SESSION['id'] . "";
     $result = $conn->query($query);

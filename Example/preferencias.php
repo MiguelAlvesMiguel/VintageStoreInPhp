@@ -246,7 +246,10 @@ https://www.tooplate.com/view/2127-little-fashion
                                             <option value="Bens alimentares de curta duracao">Bens alimentares de curta duração</option>
                                         </select>
                                         <?php
-                                        session_start();
+                                        if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
                                         if (isset ($_SESSION['utilizador']) > 0) {
                                           if($_SESSION['utilizador'] == 'instituicao'){
                                             echo "<input type='text' name='quantidade'  placeholder='Quantidade em Peso'  required/>";

@@ -27,7 +27,10 @@ if (!empty($_POST['brands'])) {
     echo "No brands selected";
 }
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
 $user_id = $_SESSION['user_id'];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Delete existing preferences

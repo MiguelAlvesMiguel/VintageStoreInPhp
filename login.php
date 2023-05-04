@@ -51,7 +51,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")  {
                 if ($result->num_rows > 0) {
                     $row = $result->fetch_assoc();
                     if (password_verify($password, $row['password_hash'])) {
-                        session_start();
+                        if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
                         $_SESSION['user_id'] = $row['user_id'];
                         $_SESSION['nome_completo'] = $row['name'];
                         $_SESSION['email'] = $row['email'];

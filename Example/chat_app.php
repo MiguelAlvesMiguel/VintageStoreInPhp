@@ -13,7 +13,10 @@
 <body>
     <?php
     include "php/abreconexao.php";  
+    if (session_status() == PHP_SESSION_NONE) {
     session_start();
+}
+;
     $ids;
     if($_SESSION['utilizador'] == 'voluntario'){
         $sql = "SELECT * FROM rel_volt WHERE id = " . $_SESSION['id'] . "";

@@ -130,7 +130,10 @@ https://www.tooplate.com/view/2127-little-fashion
     
     <?php
         include "php/abreconexao.php";  
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
         $sql = "SELECT * FROM disp_inst WHERE id = " . $_SESSION['id'] . "";
         $result = $conn->query($sql);
         $rowd = $result->fetch_assoc();

@@ -8,7 +8,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 //--------------------------------------------------//
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+;
 echo $_SESSION['id_i'];
 $query1="SELECT * FROM disp_inst WHERE id = " . $_SESSION['id_i'] . "";
 $result1 = $conn->query($query1);
