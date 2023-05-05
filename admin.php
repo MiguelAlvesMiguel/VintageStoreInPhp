@@ -15,6 +15,29 @@
 
         return $users;
     }
+    function getTransactions($conn) {
+        $sql = "SELECT Transactions.transaction_id, Transactions.buyer_id, Transactions.product_id, Transactions.purchase_date, Transactions.price,
+                buyer.name AS buyer_name, buyer.email AS buyer_email,
+                seller.name AS seller_name, seller.email AS seller_email,
+                Products.title
+                FROM Transactions
+                INNER JOIN Users AS buyer ON Transactions.buyer_id = buyer.user_id
+                INNER JOIN Products ON Transactions.product_id = Products.product_id
+                INNER JOIN Users AS seller ON Products.seller_id = seller.user_id";
+        $result = mysqli_query($conn, $sql);
+    
+        $transactions = [];
+    
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $transactions[] = $row;
+            }
+        }
+    
+        return $transactions;
+    }
+    
+    
 ?>
 
 <!DOCTYPE html>
@@ -44,28 +67,76 @@
                     <label for="gender">Gender:</label>
                     <select class="form-control" id="gender">
                         <option value="">All</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Outro">Outro</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="age">Age Range:</label>
-                    <select class="form-control" id="age">
-                        <option value="">All</option>
-                        <option value="18-25">18-25</option>
-                        <option value="26-35">26-35</option>
-                        <option value="36-45">36-45</option>
-                    </select>
-                </div>
+               
             </form>
         </div>
     </div>
     
     <br>
+    <!-- Add this inside the 'container' div, after the 'row' div and before the 'table' -->
+<!-- Transaction Summary -->
+<div class="container mt-5">
+    <h2>Transaction Summary</h2>
+    <?php
+        $transactions = getTransactions($conn);
+        $totalTransactions = count($transactions);
+        $totalRevenue = 0;
+
+        foreach ($transactions as $transaction) {
+            $totalRevenue += $transaction['price'];
+        }
+    ?>
+    <p>Total Transactions: <?php echo $totalTransactions; ?></p>
+    <p>Total Revenue: $<?php echo number_format($totalRevenue, 2); ?></p>
+</div>
+
+<!-- Transaction List -->
+<div class="container mt-5">
+    <h2>Transaction List</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Buyer Name</th>
+                <th>Buyer Email</th>
+                <th>Seller Name</th>
+                <th>Seller Email</th>
+                <th>Product Title</th>
+                <th>Purchase Date</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                foreach ($transactions as $transaction) {
+            ?>
+                <tr>
+                    <td><?php echo $transaction['transaction_id']; ?></td>
+                    <td><?php echo $transaction['buyer_name']; ?></td>
+                    <td><?php echo $transaction['buyer_email']; ?></td>
+                    <td><?php echo $transaction['seller_name']; ?></td>
+                    <td><?php echo $transaction['seller_email']; ?></td>
+                    <td><?php echo $transaction['title']; ?></td>
+                    <td><?php echo $transaction['purchase_date']; ?></td>
+                    <td>$<?php echo number_format($transaction['price'], 2); ?></td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Add a horizontal line to separate the summaries from the table -->
+<hr>
 
     <br>
 
-
+    
     <table class="table">
         <thead>
         <tr>
@@ -74,7 +145,7 @@
             <th>Location</th>
             <th>Zip Code</th>
             <th>Gender</th>
-            <th>Age Range</th>
+            <th>Age</th>
         </tr>
         </thead>
         <tbody>
@@ -85,15 +156,7 @@
                 $now = new DateTime();
                 $age = $now->diff($birthDate)->y;
 
-                if ($age >= 18 && $age <= 25) {
-                    $ageRange = "18-25";
-                } elseif ($age >= 26 && $age <= 35) {
-                    $ageRange = "26-35";
-                } elseif ($age >= 36 && $age <= 45) {
-                    $ageRange = "36-45";
-                } else {
-                    $ageRange = "Other";
-                }
+               
         ?>
             <tr>
                 <td><?php echo $user['name']; ?></td>
@@ -101,7 +164,7 @@
                 <td><?php echo $user['city']; ?></td>
                 <td><?php echo $user['postal_code']; ?></td>
                 <td><?php echo $user['gender']; ?></td>
-                <td><?php echo $ageRange; ?></td>
+                <td><?php echo $age; ?></td>
             </tr>
         <?php } ?>
 
@@ -138,19 +201,14 @@
         }).toggle();
     });
 
-    // Activate age range filter
-    $('#age').on('change', function () {
-        var value = $(this).val().toLowerCase();
-        $('tbody tr').filter(function () {
-            if (value === '') {
-                return true;
-            } else {
-                return $(this).find('td:nth-child(6)').text().toLowerCase() === value;
-            }
-        }).toggle();
-    });
+
+  
 });
 
     </script>
+
+
+    
+
     </body>
     </html>
