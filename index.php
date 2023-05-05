@@ -282,10 +282,10 @@ $('.tab a').on('click', function (e) {
     <?php if (isset($_SESSION['user_id'])) { ?>
         <form method="POST" action="purchase.php">
             <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
-            <button type="submit" class="btn btn-outline-dark mt-auto">Carrinho</button>
+            <button type="submit" class="btn btn-outline-dark mt-auto">Comprar</button>
         </form>
     <?php } else { ?>
-        <a class="btn btn-outline-dark mt-auto" href="SignIn.php">Carrinho</a>
+        <a class="btn btn-outline-dark mt-auto" href="SignIn.php">Comprar</a>
     <?php } ?>
 </div>
                         </div>

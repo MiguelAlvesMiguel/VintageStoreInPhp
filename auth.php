@@ -1,7 +1,7 @@
 
 <?php
 // include server connection
-include 'dbconnection.php';
+include 'dbConnection.php';
 declare(strict_types=1);
 // define variables and set to empty values
 $name = $email = $password= "";
